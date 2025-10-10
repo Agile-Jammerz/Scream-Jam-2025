@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float boostSpeed = 10f;
     [SerializeField] private float pukingTime = 2f;
-    [SerializeField] private float wobbleAmplitude = 100f;
+    [SerializeField] private float wobbleMultiplier = 1f;
     [SerializeField] private float maxDrunkenness = 500f;
     private float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
@@ -57,12 +57,12 @@ public class Player : MonoBehaviour
         if (drunkennessLevel > 0.25)
         {
             // Horizontal wobble
-            wobbleX = Mathf.Sin(Time.time * currentSpeed) * wobbleAmplitude;
+            wobbleX = Mathf.Sin(Time.time * currentSpeed) * (drunkennessLevel * wobbleMultiplier);
         }
         if (drunkennessLevel > 0.5)
         {
             // Forward wobble
-            wobbleZ = Mathf.Cos(Time.time * currentSpeed) * wobbleAmplitude;
+            // wobbleZ = Mathf.Cos(Time.time * currentSpeed) * wobbleAmplitude;
         }
 
         Vector3 wobble = new Vector3(wobbleX, wobbleY, wobbleZ);
