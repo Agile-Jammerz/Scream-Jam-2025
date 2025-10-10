@@ -48,4 +48,22 @@ public class KillyWilly : MonoBehaviour
             transform.rotation = targetRotation;
         }
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Killy collide");
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Killy collide");
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("Killy collide");
+        }
+    }
+
 }
