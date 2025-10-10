@@ -86,4 +86,13 @@ public class Player : MonoBehaviour
         drunkennessMeter = 0f;
         isPuking = false;
     }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Goal"))
+        {
+            GameManager.Instance.PlayerWin();
+        }
+    }
 }
