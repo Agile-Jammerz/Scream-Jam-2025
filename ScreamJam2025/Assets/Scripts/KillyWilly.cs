@@ -53,7 +53,7 @@ public class KillyWilly : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Killy collide");
+            GameManager.Instance.PlayerLose();
         }
     }
 
