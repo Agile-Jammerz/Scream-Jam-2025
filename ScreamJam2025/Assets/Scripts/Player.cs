@@ -8,7 +8,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float boostSpeed = 10f;
     [SerializeField] private float pukingTime = 2f;
     [SerializeField] private float wobbleMultiplier = 1f;
-    [SerializeField] private float maxDrunkenness = 500f;
+    [SerializeField] private float maxDrunkenness = 15f;
+    private float drunkennessIncreaseRate = 1f;
     private float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
     private bool isPuking = false;
@@ -43,7 +44,7 @@ public class Player : MonoBehaviour
         {
             // Activate boost movement
             currentSpeed = boostSpeed;
-            drunkennessMeter += 1;
+            drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
         }
         // Get input from WASD keys
         float horizontal = Input.GetAxis("Horizontal"); // A/D keys for strafing left/right
