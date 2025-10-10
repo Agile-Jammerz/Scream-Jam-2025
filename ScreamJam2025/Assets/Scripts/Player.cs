@@ -52,13 +52,13 @@ public class Player : MonoBehaviour
         
         // Create movement vector relative to player's current rotation
         Vector3 movement = transform.right * horizontal + transform.forward * vertical;
-        float wobbleX = 0f;
+        float wobbleX = Mathf.Sin(Time.time * boostSpeed) * (drunkennessLevel * wobbleMultiplier);
         float wobbleY = 0f;
         float wobbleZ = 0f;
-        if (drunkennessLevel > 0.25)
+        if (drunkennessLevel > 0.1)
         {
             // Horizontal wobble
-            wobbleX = Mathf.Sin(Time.time * currentSpeed) * (drunkennessLevel * wobbleMultiplier);
+            // wobbleX = Mathf.Sin(Time.time * currentSpeed) * (drunkennessLevel * wobbleMultiplier);
         }
         if (drunkennessLevel > 0.5)
         {
