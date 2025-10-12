@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     [Tooltip("This value controls how much the wobble amplitude [-1, 1] should be multiplies by.")]
     [SerializeField] private float wobbleMultiplier = 1f;
     [Tooltip("This value is the time in seconds of holding spacebar that results in puking.")]
-    [SerializeField] private float maxDrunkenness = 15f;
+    [SerializeField] public float maxDrunkenness = 15f;
 
     [Header("Candy Settings")]
 
@@ -27,11 +27,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float candyRestoreMagnitude = 3f;
 
     private float drunkennessIncreaseRate = 1f;
-    private float drunkennessMeter = 0f;
+    public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
     private bool isPuking = false;
 
-    private int candyCount = 0;
+    public int candyCount = 0;
     private bool consumingCandy = false;
     private float candyDecreaseRate;
 
@@ -77,7 +77,14 @@ public class Player : MonoBehaviour
             else
             {
                 float drunkennessDifference = (drunkennessIncreaseRate - candyDecreaseRate) * Time.deltaTime;
-                drunkennessMeter += Mathf.Max(0, drunkennessMeter + drunkennessDifference);
+                if (drunkennessMeter + drunkennessDifference <= 0)
+                {
+                    drunkennessMeter = 0;
+                }
+                else
+                {
+                    drunkennessMeter += drunkennessDifference;
+                }
             }
         } else if (consumingCandy)
         {
