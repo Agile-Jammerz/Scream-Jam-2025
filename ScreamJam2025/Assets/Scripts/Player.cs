@@ -3,12 +3,22 @@ using System.Collections;
 
 public class Player : MonoBehaviour
 {
-    [Header("PlayerMovement Settings")]
+    [Header("Player Movement Settings")]
+
+    [Tooltip("This value controls how fast the player moves by default.")]
     [SerializeField] private float moveSpeed = 5f;
+    [Tooltip("This value controls how fast the player moves with the drinking boost.")]
     [SerializeField] private float boostSpeed = 10f;
+
+    [Header("Drunkenness Settings")]
+
+    [Tooltip("This value controls how long the player spends puking.")]
     [SerializeField] private float pukingTime = 2f;
+    [Tooltip("This value controls how much the wobble amplitude [-1, 1] should be multiplies by.")]
     [SerializeField] private float wobbleMultiplier = 1f;
+    [Tooltip("This value is the time in seconds of holding spacebar that results in puking.")]
     [SerializeField] private float maxDrunkenness = 15f;
+
     private float drunkennessIncreaseRate = 1f;
     private float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
