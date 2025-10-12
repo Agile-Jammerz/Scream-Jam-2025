@@ -19,14 +19,25 @@ public class Player : MonoBehaviour
     [Tooltip("This value is the time in seconds of holding spacebar that results in puking.")]
     [SerializeField] private float maxDrunkenness = 15f;
 
+    [Header("Candy Settings")]
+
+    [Tooltip("This value controls how long, in seconds, the player spends eating a piece of candy.")]
+    [SerializeField] private float candyEatingTime = 1f;
+    [Tooltip("This value controls how much a piece of candyy decreases drunkenness.")]
+    [SerializeField] private float candyRestoreMagnitude = 3f;
+
     private float drunkennessIncreaseRate = 1f;
     private float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
     private bool isPuking = false;
 
+    private int candyCount = 0;
+    private bool consumingCandy = false;
+    private float candyDecreaseRate;
+
     void Start()
     {
-        
+        candyDecreaseRate = candyRestoreMagnitude / candyEatingTime;
     }
 
     void Update()
@@ -43,6 +54,11 @@ public class Player : MonoBehaviour
         }
         else if (!isPuking)
         {
+            if (Input.GetKey(KeyCode.C) && !consumingCandy)
+            {
+                Debug.Log("Eating candy");
+                EatCandy(candyEatingTime);
+            }
             HandleMovement();
         }
     }
@@ -54,7 +70,18 @@ public class Player : MonoBehaviour
         {
             // Activate boost movement
             currentSpeed = boostSpeed;
-            drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
+            if (!consumingCandy)
+            {
+                drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
+            }
+            else
+            {
+                float drunkennessDifference = (drunkennessIncreaseRate - candyDecreaseRate) * Time.deltaTime;
+                drunkennessMeter += Mathf.Max(0, drunkennessMeter + drunkennessDifference);
+            }
+        } else if (consumingCandy)
+        {
+            drunkennessMeter -= candyDecreaseRate * Time.deltaTime;
         }
         // Get input from WASD keys
         float horizontal = Input.GetAxis("Horizontal"); // A/D keys for strafing left/right
@@ -97,12 +124,34 @@ public class Player : MonoBehaviour
         isPuking = false;
     }
 
+    private void EatCandy(float duration)
+    {
+        candyCount = Mathf.Max(0, candyCount - 1);
+        consumingCandy = true;
+        StartCoroutine(CandyCoroutine(duration));
+    }
+
+    private IEnumerator CandyCoroutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        consumingCandy = false;
+    }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Goal"))
         {
             GameManager.Instance.PlayerWin();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Candy"))
+        {
+            Debug.Log("Collecting Candy");
+            Destroy(other.gameObject);
+            candyCount++;
         }
     }
 }
