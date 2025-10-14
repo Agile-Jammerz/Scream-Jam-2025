@@ -26,6 +26,11 @@ public class Player : MonoBehaviour
     [Tooltip("This value controls how much a piece of candyy decreases drunkenness.")]
     [SerializeField] private float candyRestoreMagnitude = 3f;
 
+    [Header("Particle Effects")]
+
+    [Tooltip("The particle system that plays when the player is puking.")]
+    [SerializeField] private ParticleSystem pukeParticleSystem;
+
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
@@ -140,12 +145,26 @@ public class Player : MonoBehaviour
     private void StartPuking(float duration)
     {
         isPuking = true;
+        
+        // Start the puke particle system if it exists
+        if (pukeParticleSystem != null)
+        {
+            pukeParticleSystem.Play();
+        }
+        
         StartCoroutine(PukeCoroutine(duration));
     }
 
     private IEnumerator PukeCoroutine(float duration)
     {
         yield return new WaitForSeconds(duration);
+        
+        // Stop the puke particle system if it exists
+        if (pukeParticleSystem != null)
+        {
+            pukeParticleSystem.Stop();
+        }
+        
         drunkennessMeter = 0f;
         isPuking = false;
     }
