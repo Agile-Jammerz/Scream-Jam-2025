@@ -24087,6 +24087,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   player: {fileID: 157124777}
+  animator: {fileID: 1466106152}
+  attackDuration: 10
 --- !u!1 &1563908812
 GameObject:
   m_ObjectHideFlags: 0

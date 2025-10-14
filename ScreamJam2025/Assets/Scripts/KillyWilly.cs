@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class KillyWilly : MonoBehaviour
 {
@@ -7,6 +8,12 @@ public class KillyWilly : MonoBehaviour
     
     [Header("KillyWilly Victim")]
     [SerializeField] private Transform player;
+    
+    [Header("Animation Settings")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private float attackDuration = 1f;
+    
+    private bool isAttacking = false;
     
     void Start()
     {
@@ -21,6 +28,16 @@ public class KillyWilly : MonoBehaviour
             else
             {
                 Debug.LogWarning("Killy Willy: Player not found! Make sure the player has the 'Player' tag.");
+            }
+        }
+        
+        // If animator isn't assigned, try to get it from this GameObject
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogWarning("Killy Willy: Animator component not found! Make sure to assign an Animator component.");
             }
         }
     }
@@ -51,10 +68,42 @@ public class KillyWilly : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") && !isAttacking)
         {
-            GameManager.Instance.PlayerLose();
+            StartAttack();
         }
+    }
+    
+    private void StartAttack()
+    {
+        isAttacking = true;
+        
+        // Trigger the attack animation
+        if (animator != null)
+        {
+            animator.SetBool("IsAttacking", true);
+        }
+        
+        // Start the attack duration coroutine
+        StartCoroutine(AttackSequence());
+    }
+    
+    private IEnumerator AttackSequence()
+    {
+        // Wait for the attack duration
+        yield return new WaitForSeconds(attackDuration);
+        
+        // Reset the attack animation
+        if (animator != null)
+        {
+            animator.SetBool("IsAttacking", false);
+        }
+        
+        // Call the game manager to handle player loss
+        GameManager.Instance.PlayerLose();
+        
+        // Reset the attacking state
+        isAttacking = false;
     }
 
 }
