@@ -3147,6 +3147,7 @@ GameObject:
   - component: {fileID: 157124776}
   - component: {fileID: 157124775}
   - component: {fileID: 157124780}
+  - component: {fileID: 157124781}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3291,6 +3292,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!136 &157124781
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157124773}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.90594554
+  m_Height: 1.8951621
+  m_Direction: 1
+  m_Center: {x: 0.15108812, y: 0.05921626, z: 0.083516836}
 --- !u!43 &188104821
 Mesh:
   m_ObjectHideFlags: 0
@@ -5793,6 +5817,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loseScreen: {fileID: 1101217042}
   winScreen: {fileID: 618853584}
+  isGameActive: 1
 --- !u!4 &340415709
 Transform:
   m_ObjectHideFlags: 0
@@ -24029,9 +24054,10 @@ GameObject:
   - component: {fileID: 1562635044}
   - component: {fileID: 1562635045}
   - component: {fileID: 1562635043}
+  - component: {fileID: 1562635046}
   m_Layer: 0
   m_Name: KillyWilly
-  m_TagString: Untagged
+  m_TagString: KillyWilly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24055,8 +24081,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.5688214, y: 1.4129589, z: 1.7819161}
+  m_Center: {x: 0.015711427, y: 0.20647943, z: 0.39095807}
 --- !u!4 &1562635044
 Transform:
   m_ObjectHideFlags: 0
@@ -24066,7 +24092,7 @@ Transform:
   m_GameObject: {fileID: 1562635040}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.25, z: -17.52}
+  m_LocalPosition: {x: 0, y: 2.61, z: -17.52}
   m_LocalScale: {x: 2, y: 4, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -24087,8 +24113,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   player: {fileID: 157124777}
+  attackRange: 5
+  useDistanceDetection: 1
   animator: {fileID: 1466106152}
-  attackDuration: 10
+  attackDuration: 4
+  danceDuration: 2
+--- !u!136 &1562635046
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562635040}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.6106867
+  m_Height: 2.9435358
+  m_Direction: 1
+  m_Center: {x: 0.04997444, y: 0.30984807, z: 0.2930032}
 --- !u!1 &1563908812
 GameObject:
   m_ObjectHideFlags: 0

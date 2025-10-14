@@ -42,6 +42,25 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        // Check if game is still active before processing any input
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null! Make sure GameManager is in the scene.");
+            return;
+        }
+        
+        if (!GameManager.Instance.isGameActive)
+        {
+            Debug.Log("Player: Game is not active, stopping movement");
+            return;
+        }
+        
+        // Debug: Show that Update is running and game is active
+        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        {
+            Debug.Log("Player: Moving - isGameActive = " + GameManager.Instance.isGameActive);
+        }
+        
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
         if (isPuking)
         {
@@ -146,16 +165,34 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Goal"))
+        HandleCollision(collision.gameObject);
+    }
+    
+    void OnTriggerEnter(Collider other)
+    {
+        HandleCollision(other.gameObject);
+    }
+    
+    void OnCollisionStay(Collision collision)
+    {
+        HandleCollision(collision.gameObject);
+    }
+    
+    void OnTriggerStay(Collider other)
+    {
+        HandleCollision(other.gameObject);
+    }
+    
+    private void HandleCollision(GameObject other)
+    {
+        if (other.CompareTag("Goal"))
         {
+            Debug.Log("Player: Goal collision detected via " + (other.GetComponent<Collider>().isTrigger ? "Trigger" : "Collision"));
             GameManager.Instance.PlayerWin();
         }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Candy"))
+        else if (other.CompareTag("Candy"))
         {
+            Debug.Log("Player: Candy collision detected via " + (other.GetComponent<Collider>().isTrigger ? "Trigger" : "Collision"));
             Debug.Log("Collecting Candy");
             Destroy(other.gameObject);
             candyCount++;

@@ -9,11 +9,17 @@ public class KillyWilly : MonoBehaviour
     [Header("KillyWilly Victim")]
     [SerializeField] private Transform player;
     
+    [Header("Collision Detection")]
+    [SerializeField] private float attackRange = 1.5f;
+    [SerializeField] private bool useDistanceDetection = true;
+    
     [Header("Animation Settings")]
     [SerializeField] private Animator animator;
     [SerializeField] private float attackDuration = 1f;
+    [SerializeField] private float danceDuration = 2f;
     
     private bool isAttacking = false;
+    private bool isDancing = false;
     
     void Start()
     {
@@ -44,9 +50,29 @@ public class KillyWilly : MonoBehaviour
 
     void Update()
     {
+        // Check if game is still active before moving
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null! Make sure GameManager is in the scene.");
+            return;
+        }
+        
+        if (!GameManager.Instance.isGameActive)
+        {
+            Debug.Log("KillyWilly: Game is not active, stopping movement");
+            return;
+        }
+        
         if (player != null)
         {
+            Debug.Log("KillyWilly: Moving towards player - isGameActive = " + GameManager.Instance.isGameActive);
             MoveTowardsPlayer();
+            
+            // Distance-based collision detection as backup
+            if (useDistanceDetection && !isAttacking)
+            {
+                CheckDistanceToPlayer();
+            }
         }
     }
     
@@ -65,11 +91,45 @@ public class KillyWilly : MonoBehaviour
             transform.rotation = targetRotation;
         }
     }
+    
+    private void CheckDistanceToPlayer()
+    {
+        if (player == null) return;
+        
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        
+        if (distanceToPlayer <= attackRange)
+        {
+            Debug.Log("KillyWilly: Player within attack range (" + distanceToPlayer.ToString("F2") + " units)");
+            HandlePlayerCollision(player.gameObject);
+        }
+    }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player") && !isAttacking)
+        HandlePlayerCollision(collision.gameObject);
+    }
+    
+    void OnTriggerEnter(Collider other)
+    {
+        HandlePlayerCollision(other.gameObject);
+    }
+    
+    void OnCollisionStay(Collision collision)
+    {
+        HandlePlayerCollision(collision.gameObject);
+    }
+    
+    void OnTriggerStay(Collider other)
+    {
+        HandlePlayerCollision(other.gameObject);
+    }
+    
+    private void HandlePlayerCollision(GameObject other)
+    {
+        if (other.CompareTag("Player") && !isAttacking && GameManager.Instance.isGameActive)
         {
+            Debug.Log("KillyWilly: Player collision detected via " + (other.GetComponent<Collider>().isTrigger ? "Trigger" : "Collision"));
             StartAttack();
         }
     }
@@ -99,11 +159,54 @@ public class KillyWilly : MonoBehaviour
             animator.SetBool("IsAttacking", false);
         }
         
+        // Start dancing animation
+        StartDancing();
+        
+        // Wait for the dance duration
+        yield return new WaitForSeconds(danceDuration);
+        
+        // Stop dancing animation
+        StopDancing();
+        
         // Call the game manager to handle player loss
+        Debug.Log("KillyWilly: About to call PlayerLose()");
         GameManager.Instance.PlayerLose();
+        Debug.Log("KillyWilly: PlayerLose() called, isGameActive = " + GameManager.Instance.isGameActive);
         
         // Reset the attacking state
         isAttacking = false;
+    }
+    
+    private void StartDancing()
+    {
+        isDancing = true;
+        
+        // Trigger the dancing animation
+        if (animator != null)
+        {
+            animator.SetBool("IsDancing", true);
+            Debug.Log("KillyWilly: Started dancing animation");
+        }
+        else
+        {
+            Debug.LogWarning("Killy Willy: Animator not found, cannot start dancing animation");
+        }
+    }
+    
+    private void StopDancing()
+    {
+        isDancing = false;
+        
+        // Stop the dancing animation
+        if (animator != null)
+        {
+            animator.SetBool("IsDancing", false);
+            Debug.Log("KillyWilly: Stopped dancing animation");
+        }
+        else
+        {
+            Debug.LogWarning("Killy Willy: Animator not found, cannot stop dancing animation");
+        }
     }
 
 }
