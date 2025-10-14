@@ -23426,6 +23426,63 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
+--- !u!1001 &1466106149
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.2911277
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.7523847
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
+      propertyPath: m_Name
+      value: KILLYWILLY@Walking
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d5a4e56adf1674334b453e9b6d781ac8, type: 3}
 --- !u!4 &1480560692 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7785828269364913250, guid: f7b0f4e4ec19c428aa481357caaf92a2, type: 3}
@@ -33581,3 +33638,4 @@ SceneRoots:
   - {fileID: 1606921717}
   - {fileID: 1052183645}
   - {fileID: 1980533356}
+  - {fileID: 1466106149}
