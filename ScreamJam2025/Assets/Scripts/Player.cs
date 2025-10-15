@@ -17,13 +17,17 @@ public class Player : MonoBehaviour
     [Tooltip("This value controls how long the player spends puking.")]
     [SerializeField] private float pukingTime = 2f;
     [Tooltip("This value controls the wobble amplitude.")]
-    [SerializeField] private float wobbleAmplitude = 5f;
+    [SerializeField] public float wobbleAmplitude = 5f;
     [Tooltip("This value controls the starting wobble frequency.")]
-    [SerializeField] private float startingWobbleFrequency = 1f;
+    [SerializeField] public float startingWobbleFrequency = 1f;
     [Tooltip("This value controls the maximum wobble frequency.")]
-    [SerializeField] private float maximumWobbleFrequency = 3f;
+    [SerializeField] public float maximumWobbleFrequency = 3f;
     [Tooltip("This value is the time in seconds of holding spacebar that results in puking.")]
     [SerializeField] public float maxDrunkenness = 15f;
+    [Tooltip("This value is what to multiply the amplitude by to mark the bounds for which the player will fall.")]
+    [SerializeField] public float fallingThreshold = 0.8f;
+    [Tooltip("This value is what to multiply the strength of the strafing movement.")]
+    [SerializeField] public float strafingCoefficient = 0.8f;
 
     [Header("Candy Settings")]
 
@@ -49,7 +53,7 @@ public class Player : MonoBehaviour
     private bool consumingCandy = false;
     private float candyDecreaseRate;
 
-    private float baseX;
+    public float baseX;
     private bool hasFallen = false;
     private float fallTime = Mathf.PI;
 
@@ -165,14 +169,14 @@ public class Player : MonoBehaviour
         }
 
         Vector3 wobble = new Vector3(wobbleX, wobbleY, wobbleZ);
-        Vector3 finalMovement = movement * currentSpeed * wobbleFrequency * 0.8f * Time.deltaTime;
+        Vector3 finalMovement = movement * currentSpeed * wobbleFrequency * strafingCoefficient * Time.deltaTime;
 
         // Apply movement
         transform.position += finalMovement + wobble;
 
         if (Time.time > 3)
         {
-            if (transform.position.x < baseX - wobbleAmplitude * 0.8 || transform.position.x > baseX + wobbleAmplitude * 0.8)
+            if (transform.position.x < baseX - wobbleAmplitude * fallingThreshold || transform.position.x > baseX + wobbleAmplitude * fallingThreshold)
             {
                 Fall(fallTime);
             }
@@ -231,6 +235,7 @@ public class Player : MonoBehaviour
     private IEnumerator FallCoroutine(float duration)
     {
         yield return new WaitForSeconds(duration);
+        UIManager.Instance.ResetBalanceBar();
         hasFallen = false;
         wobbleFrequency = startingWobbleFrequency;
     }
