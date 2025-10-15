@@ -36,6 +36,11 @@ public class Player : MonoBehaviour
     [Tooltip("This value controls how much a piece of candyy decreases drunkenness.")]
     [SerializeField] private float candyRestoreMagnitude = 3f;
 
+    [Header("Animation")]
+
+    [Tooltip("The animator component for player animations.")]
+    [SerializeField] private Animator animator;
+
     [Header("Particle Effects")]
 
     [Tooltip("The particle system that plays when the player is puking.")]
@@ -48,6 +53,8 @@ public class Player : MonoBehaviour
     private float wobbleFrequencyIncreaseRate = 0.05f;
     private float wobbleFrequency;
     private float currentSpeed;
+    private bool isSprinting = false;
+    private bool isDead = false;
 
     public int candyCount = 0;
     private bool consumingCandy = false;
@@ -99,7 +106,7 @@ public class Player : MonoBehaviour
             Debug.Log("Started Puking");
             StartPuking(pukingTime);
         }
-        else if (!hasFallen)
+        else if (!hasFallen && !isDead)
         {
             if (Input.GetKey(KeyCode.C) && !consumingCandy && candyCount > 0)
             {
@@ -120,6 +127,7 @@ public class Player : MonoBehaviour
         {
             // Activate boost movement
             currentSpeed = boostSpeed;
+            isSprinting = true;
             if (!consumingCandy)
             {
                 drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
@@ -139,6 +147,7 @@ public class Player : MonoBehaviour
         } else
         {
             currentSpeed = moveSpeed;
+            isSprinting = false;
             if (consumingCandy)
             {
                 drunkennessMeter = Mathf.Max(0, drunkennessMeter - candyDecreaseRate * Time.deltaTime);
@@ -173,6 +182,13 @@ public class Player : MonoBehaviour
 
         // Apply movement
         transform.position += finalMovement + wobble;
+
+        // Update animator parameters
+        if (animator != null)
+        {
+            animator.SetBool("IsSprinting", isSprinting);
+            animator.SetBool("IsDead", isDead);
+        }
 
         if (Time.time > 3)
         {
@@ -240,6 +256,23 @@ public class Player : MonoBehaviour
         wobbleFrequency = startingWobbleFrequency;
     }
 
+    private void PlayerDeath()
+    {
+        isDead = true;
+        
+        // Update animator to trigger death animation
+        if (animator != null)
+        {
+            animator.SetBool("IsDead", true);
+        }
+        
+        // Stop all movement and interactions
+        currentSpeed = 0f;
+        isSprinting = false;
+        
+        Debug.Log("Player has died! Game Over.");
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         HandleCollision(collision.gameObject);
@@ -273,6 +306,14 @@ public class Player : MonoBehaviour
             Debug.Log("Collecting Candy");
             Destroy(other.gameObject);
             candyCount++;
+        }
+        else if (other.CompareTag("KillyWilly"))
+        {
+            Debug.Log("Player: Caught by Killy Willy!");
+            if (!isDead)
+            {
+                PlayerDeath();
+            }
         }
     }
 }

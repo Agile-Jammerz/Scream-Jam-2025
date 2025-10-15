@@ -651,6 +651,7 @@ MonoBehaviour:
   strafingCoefficient: 0.8
   candyEatingTime: 1
   candyRestoreMagnitude: 3
+  animator: {fileID: 1608571553}
   pukeParticleSystem: {fileID: 756367558}
   drunkennessMeter: 0
   candyCount: 0
@@ -4375,10 +4376,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   player: {fileID: 157124777}
-  attackRange: 5
+  attackRange: 3
   useDistanceDetection: 1
   animator: {fileID: 1466106152}
-  attackDuration: 4
+  attackDuration: 1
   danceDuration: 2
 --- !u!136 &1562635046
 CapsuleCollider:
@@ -5994,8 +5995,8 @@ SceneRoots:
   - {fileID: 278827942}
   - {fileID: 25722626}
   - {fileID: 618120055}
-  - {fileID: 1562635044}
   - {fileID: 2014458433}
   - {fileID: 1761142174}
   - {fileID: 1443193135}
+  - {fileID: 1562635044}
   - {fileID: 157124777}
