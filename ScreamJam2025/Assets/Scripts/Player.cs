@@ -130,9 +130,12 @@ public class Player : MonoBehaviour
             }
         }
         // Get input from WASD keys
-        float horizontal = Input.GetAxis("Horizontal"); // A/D keys for strafing left/right
-        float vertical = Input.GetAxis("Vertical");     // W/S keys for forward/backward movement
-        
+        /*float horizontal = Input.GetAxis("Horizontal"); // A/D keys for strafing left/right
+        float vertical = Input.GetAxis("Vertical");     // W/S keys for forward/backward movement*/
+        // Constant Forward Movement
+        float horizontal = 0;
+        float vertical = 1;
+
         // Create movement vector relative to player's current rotation
         Vector3 movement = transform.right * horizontal + transform.forward * vertical;
         float wobbleX = Mathf.Sin(Time.time * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
