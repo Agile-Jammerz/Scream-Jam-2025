@@ -65,7 +65,7 @@ public class KillyWilly : MonoBehaviour
         
         if (player != null)
         {
-            Debug.Log("KillyWilly: Moving towards player - isGameActive = " + GameManager.Instance.isGameActive);
+            // Debug.Log("KillyWilly: Moving towards player - isGameActive = " + GameManager.Instance.isGameActive);
             MoveTowardsPlayer();
             
             // Distance-based collision detection as backup

@@ -4,11 +4,20 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
     [Header("References")]
     [SerializeField] private Player player;
     [SerializeField] private Slider drunkennessBar;
+    [SerializeField] private Slider balanceBar;
     [SerializeField] private Image drunkennessFill;
     [SerializeField] private TextMeshProUGUI candyText;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,6 +29,10 @@ public class UIManager : MonoBehaviour
         drunkennessBar.minValue = 0;
         drunkennessBar.maxValue = player.maxDrunkenness;
         drunkennessBar.value = 0;
+        
+        balanceBar.minValue = player.baseX - (player.wobbleAmplitude * player.fallingThreshold);
+        balanceBar.maxValue = player.baseX + (player.wobbleAmplitude * player.fallingThreshold);
+        balanceBar.value = player.baseX;
 
         candyText.text = $"Candy: {player.candyCount}";
     }
@@ -29,6 +42,7 @@ public class UIManager : MonoBehaviour
     {
         UpdateDrunkenness();
         UpdateCandy();
+        UpdateBalance();
     }
 
     private void UpdateDrunkenness()
@@ -50,5 +64,17 @@ public class UIManager : MonoBehaviour
     private void UpdateCandy()
     {
         candyText.text = $"Candy: {player.candyCount}";
+    }
+
+    private void UpdateBalance()
+    {
+        balanceBar.value = player.transform.position.x;
+    }
+
+    public void ResetBalanceBar()
+    {
+        balanceBar.minValue = player.baseX - (player.wobbleAmplitude * player.fallingThreshold);
+        balanceBar.maxValue = player.baseX + (player.wobbleAmplitude * player.fallingThreshold);
+        balanceBar.value = player.baseX;
     }
 }
