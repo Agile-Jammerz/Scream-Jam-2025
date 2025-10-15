@@ -642,8 +642,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   boostSpeed: 4
+  pukeSpeed: 1.5
   pukingTime: 2
-  wobbleMultiplier: 1
+  wobbleAmplitude: 5
+  startingWobbleFrequency: 1
+  maximumWobbleFrequency: 4
   maxDrunkenness: 7
   candyEatingTime: 1
   candyRestoreMagnitude: 3
@@ -3828,7 +3831,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1562635043
 BoxCollider:
   m_ObjectHideFlags: 0

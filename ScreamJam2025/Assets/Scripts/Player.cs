@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [Tooltip("This value controls how fast the player moves with the drinking boost.")]
     [SerializeField] private float boostSpeed = 10f;
+    [Tooltip("This value controls how fast the player moves when puking.")]
+    [SerializeField] private float pukeSpeed = 1f;
 
     [Header("Drunkenness Settings")]
 
@@ -39,7 +41,7 @@ public class Player : MonoBehaviour
     public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
     private bool isPuking = false;
-    private float wobbleFrequencyIncreaseRate = 0.1f;
+    private float wobbleFrequencyIncreaseRate = 0.05f;
     private float wobbleFrequency;
     private float currentSpeed;
 
@@ -47,11 +49,17 @@ public class Player : MonoBehaviour
     private bool consumingCandy = false;
     private float candyDecreaseRate;
 
+    private float baseX;
+    private bool hasFallen = false;
+    private float fallTime = Mathf.PI;
+
     void Start()
     {
         candyDecreaseRate = candyRestoreMagnitude / candyEatingTime;
         wobbleFrequency = startingWobbleFrequency;
         currentSpeed = moveSpeed;
+        /*pukingTime = Mathf.PI;*/
+        baseX = transform.position.x;
     }
 
     void Update()
@@ -77,18 +85,17 @@ public class Player : MonoBehaviour
         
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
         wobbleFrequency = Mathf.Min(wobbleFrequency + (wobbleFrequencyIncreaseRate * Time.deltaTime), maximumWobbleFrequency);
-        /*        wobbleFrequency = Mathf.Min(Mathf.Pow(wobbleFrequency, 2), maximumWobbleFrequency);
-        */
-        if (isPuking)
+
+        /*if (isPuking)
         {
             return;
-        }
-        else if (drunkennessMeter >= maxDrunkenness)
+        }*/
+        if (!isPuking && drunkennessMeter >= maxDrunkenness)
         {
             Debug.Log("Started Puking");
             StartPuking(pukingTime);
         }
-        else if (!isPuking)
+        else if (!hasFallen)
         {
             if (Input.GetKey(KeyCode.C) && !consumingCandy && candyCount > 0)
             {
@@ -101,7 +108,11 @@ public class Player : MonoBehaviour
     
     private void HandleMovement()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (isPuking)
+        {
+            currentSpeed = pukeSpeed;
+        }
+        else if (Input.GetKey(KeyCode.Space))
         {
             // Activate boost movement
             currentSpeed = boostSpeed;
@@ -132,13 +143,14 @@ public class Player : MonoBehaviour
         // Get input from WASD keys
         /*float horizontal = Input.GetAxis("Horizontal"); // A/D keys for strafing left/right
         float vertical = Input.GetAxis("Vertical");     // W/S keys for forward/backward movement*/
+
         // Constant Forward Movement
-        float horizontal = 0;
+        float horizontal = Input.GetAxis("Horizontal");
         float vertical = 1;
 
         // Create movement vector relative to player's current rotation
         Vector3 movement = transform.right * horizontal + transform.forward * vertical;
-        float wobbleX = Mathf.Sin(Time.time * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
+        float wobbleX = Mathf.Cos((Time.time + 0.0f * Mathf.PI) * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
         float wobbleY = 0f;
         float wobbleZ = 0f;
         if (drunkennessLevel > 0.1)
@@ -153,10 +165,18 @@ public class Player : MonoBehaviour
         }
 
         Vector3 wobble = new Vector3(wobbleX, wobbleY, wobbleZ);
-        Vector3 finalMovement = movement * currentSpeed * Time.deltaTime;
+        Vector3 finalMovement = movement * currentSpeed * wobbleFrequency * 0.8f * Time.deltaTime;
 
         // Apply movement
         transform.position += finalMovement + wobble;
+
+        if (Time.time > 3)
+        {
+            if (transform.position.x < baseX - wobbleAmplitude * 0.8 || transform.position.x > baseX + wobbleAmplitude * 0.8)
+            {
+                Fall(fallTime);
+            }
+        }
 
     }
 
@@ -198,6 +218,21 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(duration);
         consumingCandy = false;
+    }
+
+    private void Fall(float duration)
+    {
+        Debug.Log("Fallen");
+        hasFallen = true;
+        baseX = transform.position.x;
+        StartCoroutine(FallCoroutine(duration));
+    }
+
+    private IEnumerator FallCoroutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        hasFallen = false;
+        wobbleFrequency = startingWobbleFrequency;
     }
 
     void OnCollisionEnter(Collision collision)
