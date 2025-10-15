@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
 
     [Tooltip("The animator component for player animations.")]
     [SerializeField] private Animator animator;
+    [Tooltip("Avatar mask for drinking animation - should only affect torso, arms, and head.")]
+    [SerializeField] private AvatarMask drinkingAvatarMask;
 
     [Header("Particle Effects")]
 
@@ -55,6 +57,7 @@ public class Player : MonoBehaviour
     private float currentSpeed;
     private bool isSprinting = false;
     private bool isDead = false;
+    private bool isDrinking = false;
 
     public int candyCount = 0;
     private bool consumingCandy = false;
@@ -125,9 +128,10 @@ public class Player : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.Space))
         {
-            // Activate boost movement
+            // Activate boost movement and drinking
             currentSpeed = boostSpeed;
             isSprinting = true;
+            isDrinking = true;
             if (!consumingCandy)
             {
                 drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
@@ -148,6 +152,7 @@ public class Player : MonoBehaviour
         {
             currentSpeed = moveSpeed;
             isSprinting = false;
+            isDrinking = false;
             if (consumingCandy)
             {
                 drunkennessMeter = Mathf.Max(0, drunkennessMeter - candyDecreaseRate * Time.deltaTime);
@@ -188,6 +193,7 @@ public class Player : MonoBehaviour
         {
             animator.SetBool("IsSprinting", isSprinting);
             animator.SetBool("IsDead", isDead);
+            animator.SetBool("IsDrinking", isDrinking);
         }
 
         if (Time.time > 3)
@@ -269,6 +275,7 @@ public class Player : MonoBehaviour
         // Stop all movement and interactions
         currentSpeed = 0f;
         isSprinting = false;
+        isDrinking = false;
         
         Debug.Log("Player has died! Game Over.");
     }
