@@ -40,8 +40,6 @@ public class Player : MonoBehaviour
 
     [Tooltip("The animator component for player animations.")]
     [SerializeField] private Animator animator;
-    [Tooltip("Avatar mask for drinking animation - should only affect torso, arms, and head.")]
-    [SerializeField] private AvatarMask drinkingAvatarMask;
 
     [Header("Particle Effects")]
 
@@ -57,7 +55,6 @@ public class Player : MonoBehaviour
     private float currentSpeed;
     private bool isSprinting = false;
     private bool isDead = false;
-    private bool isDrinking = false;
 
     public int candyCount = 0;
     private bool consumingCandy = false;
@@ -74,6 +71,12 @@ public class Player : MonoBehaviour
         currentSpeed = moveSpeed;
         /*pukingTime = Mathf.PI;*/
         baseX = transform.position.x;
+        
+        // Ensure puke particle system is stopped at start
+        if (pukeParticleSystem != null)
+        {
+            pukeParticleSystem.Stop();
+        }
     }
 
     void Update()
@@ -99,6 +102,9 @@ public class Player : MonoBehaviour
         
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
         wobbleFrequency = Mathf.Min(wobbleFrequency + (wobbleFrequencyIncreaseRate * Time.deltaTime), maximumWobbleFrequency);
+
+        // Safety check: Ensure particle system state matches isPuking state
+        UpdatePukeParticleSystem();
 
         /*if (isPuking)
         {
@@ -128,10 +134,9 @@ public class Player : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.Space))
         {
-            // Activate boost movement and drinking
+            // Activate boost movement
             currentSpeed = boostSpeed;
             isSprinting = true;
-            isDrinking = true;
             if (!consumingCandy)
             {
                 drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
@@ -152,7 +157,6 @@ public class Player : MonoBehaviour
         {
             currentSpeed = moveSpeed;
             isSprinting = false;
-            isDrinking = false;
             if (consumingCandy)
             {
                 drunkennessMeter = Mathf.Max(0, drunkennessMeter - candyDecreaseRate * Time.deltaTime);
@@ -193,7 +197,6 @@ public class Player : MonoBehaviour
         {
             animator.SetBool("IsSprinting", isSprinting);
             animator.SetBool("IsDead", isDead);
-            animator.SetBool("IsDrinking", isDrinking);
         }
 
         if (Time.time > 3)
@@ -210,11 +213,8 @@ public class Player : MonoBehaviour
     {
         isPuking = true;
         
-        // Start the puke particle system if it exists
-        if (pukeParticleSystem != null)
-        {
-            pukeParticleSystem.Play();
-        }
+        // Update particle system state
+        UpdatePukeParticleSystem();
         
         StartCoroutine(PukeCoroutine(duration));
     }
@@ -223,14 +223,11 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(duration);
         
-        // Stop the puke particle system if it exists
-        if (pukeParticleSystem != null)
-        {
-            pukeParticleSystem.Stop();
-        }
-        
         drunkennessMeter = 0f;
         isPuking = false;
+        
+        // Update particle system state
+        UpdatePukeParticleSystem();
     }
 
     private void EatCandy(float duration)
@@ -275,9 +272,32 @@ public class Player : MonoBehaviour
         // Stop all movement and interactions
         currentSpeed = 0f;
         isSprinting = false;
-        isDrinking = false;
+        
+        // Stop puke particle system when player dies
+        UpdatePukeParticleSystem();
         
         Debug.Log("Player has died! Game Over.");
+    }
+
+    private void UpdatePukeParticleSystem()
+    {
+        if (pukeParticleSystem != null)
+        {
+            if (isPuking)
+            {
+                if (!pukeParticleSystem.isPlaying)
+                {
+                    pukeParticleSystem.Play();
+                }
+            }
+            else
+            {
+                if (pukeParticleSystem.isPlaying)
+                {
+                    pukeParticleSystem.Stop();
+                }
+            }
+        }
     }
 
     void OnCollisionEnter(Collision collision)

@@ -652,7 +652,6 @@ MonoBehaviour:
   candyEatingTime: 1
   candyRestoreMagnitude: 3
   animator: {fileID: 1608571553}
-  drinkingAvatarMask: {fileID: 0}
   pukeParticleSystem: {fileID: 756367558}
   drunkennessMeter: 0
   candyCount: 0
