@@ -639,7 +639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88761e1bf569643c29c093c5aab9a08d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
+  moveSpeed: 2.5
   boostSpeed: 4
   pukeSpeed: 1.5
   pukingTime: 2
@@ -1082,7 +1082,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233689097}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -4888,7 +4888,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 5fac827c48d49417d9320b611980593e, type: 3}
+  m_Resource: {fileID: 8300000, guid: 79c4c2e71a15d4062be619963e103245, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
