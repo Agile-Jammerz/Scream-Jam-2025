@@ -40,6 +40,11 @@ public class Player : MonoBehaviour
 
     [Tooltip("The animator component for player animations.")]
     [SerializeField] private Animator animator;
+    
+    [Header("Victory Animation Settings")]
+    
+    [Tooltip("Duration for each victory animation before switching to the next one.")]
+    [SerializeField] private float victoryAnimationDuration = 1.0f;
 
     [Header("Particle Effects")]
 
@@ -55,6 +60,7 @@ public class Player : MonoBehaviour
     private float currentSpeed;
     private bool isSprinting = false;
     private bool isDead = false;
+    private bool isVictory = false;
 
     public int candyCount = 0;
     private bool consumingCandy = false;
@@ -115,7 +121,7 @@ public class Player : MonoBehaviour
             Debug.Log("Started Puking");
             StartPuking(pukingTime);
         }
-        else if (!hasFallen && !isDead)
+        else if (!hasFallen && !isDead && !isVictory)
         {
             if (Input.GetKey(KeyCode.C) && !consumingCandy && candyCount > 0)
             {
@@ -295,6 +301,63 @@ public class Player : MonoBehaviour
         wobbleFrequency = startingWobbleFrequency;
     }
 
+    private void StartVictoryAnimation()
+    {
+        isVictory = true;
+        Debug.Log("Starting victory animation sequence!");
+        
+        // Reset movement-related variables
+        isSprinting = false;
+        currentSpeed = 0f; // Stop movement completely
+        
+        // Clear all other animation states to prevent conflicts
+        if (animator != null)
+        {
+            // Reset all movement-related animations
+            animator.SetBool("IsSprinting", false);
+            animator.SetBool("IsFalling", false);
+            animator.SetBool("IsStanding", false);
+            
+            // Start with first jump animation
+            animator.SetBool("VictoryJump1", true);
+            animator.SetBool("VictoryJump2", false);
+            
+            Debug.Log("Cleared all other animation states and set VictoryJump1=true");
+        }
+        
+        StartCoroutine(VictoryAnimationCoroutine());
+    }
+
+    private IEnumerator VictoryAnimationCoroutine()
+    {
+        bool useFirstJumpAnimation = true;
+        
+        while (isVictory)
+        {
+            // Wait for the animation duration
+            yield return new WaitForSeconds(victoryAnimationDuration);
+            
+            // Switch to the other animation
+            useFirstJumpAnimation = !useFirstJumpAnimation;
+            
+            // Toggle between the two jumping animations
+            if (animator != null)
+            {
+                if (useFirstJumpAnimation)
+                {
+                    animator.SetBool("VictoryJump2", false);
+                    animator.SetBool("VictoryJump1", true);
+                }
+                else
+                {
+                    animator.SetBool("VictoryJump1", false);
+                    animator.SetBool("VictoryJump2", true);
+                }
+                Debug.Log($"Switched to victory animation: {(useFirstJumpAnimation ? "Jump1" : "Jump2")}");
+            }
+        }
+    }
+
     private void PlayerDeath()
     {
         isDead = true;
@@ -361,6 +424,13 @@ public class Player : MonoBehaviour
         if (other.CompareTag("Goal"))
         {
             Debug.Log("Player: Goal collision detected via " + (other.GetComponent<Collider>().isTrigger ? "Trigger" : "Collision"));
+            
+            // Start victory animation before calling PlayerWin
+            if (!isVictory && !isDead)
+            {
+                StartVictoryAnimation();
+            }
+            
             GameManager.Instance.PlayerWin();
         }
         else if (other.CompareTag("Candy"))

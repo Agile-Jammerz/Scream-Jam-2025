@@ -953,6 +953,7 @@ MonoBehaviour:
   candyEatingTime: 1
   candyRestoreMagnitude: 3
   animator: {fileID: 1608571553}
+  victoryAnimationDuration: 1
   pukeParticleSystem: {fileID: 756367558}
   drunkennessMeter: 0
   candyCount: 0
@@ -4975,7 +4976,7 @@ Transform:
   m_GameObject: {fileID: 1418605301}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.54, y: 6.2, z: -3.8}
+  m_LocalPosition: {x: 0.54, y: 6.2, z: -235.1}
   m_LocalScale: {x: 20.076, y: 20.076, z: 20.076}
   m_ConstrainProportionsScale: 1
   m_Children: []
