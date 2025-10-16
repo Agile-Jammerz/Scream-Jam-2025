@@ -554,22 +554,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1685413960}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b698a5b516b4540e786ba4c08caabce1, type: 3}
+  m_Script: {fileID: 11500000, guid: 42b63e4a4fb4e2f48a97ece24fd3a945, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startButton: {fileID: 0}
-  quitButton: {fileID: 0}
-  settingsButton: {fileID: 0}
-  titleText: {fileID: 0}
-  versionText: {fileID: 0}
-  animateTitle: 1
-  titleAnimationSpeed: 2
-  titleAnimationAmplitude: 0.1
-  backgroundMusic: {fileID: 0}
-  buttonClickSound: {fileID: 0}
-  menuMusic: {fileID: 0}
-  titleOriginalPosition: {x: 0, y: 0, z: 0}
-  titleAnimationTime: 0
 --- !u!4 &1685413962
 Transform:
   m_ObjectHideFlags: 0
@@ -941,7 +928,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2008279188}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1685413961}
+        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2008279188
 MonoBehaviour:
   m_ObjectHideFlags: 0

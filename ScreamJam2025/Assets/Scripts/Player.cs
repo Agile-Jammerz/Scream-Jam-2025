@@ -171,7 +171,7 @@ public class Player : MonoBehaviour
         float vertical = 1;
 
         // Create movement vector relative to player's current rotation
-        Vector3 movement = transform.right * horizontal + transform.forward * vertical;
+        Vector3 movement = transform.right * horizontal * wobbleFrequency * strafingCoefficient + transform.forward * vertical;
         float wobbleX = Mathf.Cos((Time.time + 0.0f * Mathf.PI) * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
         float wobbleY = 0f;
         float wobbleZ = 0f;
@@ -187,7 +187,7 @@ public class Player : MonoBehaviour
         }
 
         Vector3 wobble = new Vector3(wobbleX, wobbleY, wobbleZ);
-        Vector3 finalMovement = movement * currentSpeed * wobbleFrequency * strafingCoefficient * Time.deltaTime;
+        Vector3 finalMovement = movement * currentSpeed * Time.deltaTime;
 
         // Apply movement
         transform.position += finalMovement + wobble;
