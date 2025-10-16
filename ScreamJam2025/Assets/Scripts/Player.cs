@@ -58,6 +58,11 @@ public class Player : MonoBehaviour
     [Tooltip("The particle system that plays when the player is puking.")]
     [SerializeField] private ParticleSystem pukeParticleSystem;
 
+    [Header("Audio Effects")]
+
+    [Tooltip("The audio source that plays the puke sound effect.")]
+    [SerializeField] private AudioSource pukeAudioSource;
+
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
@@ -89,6 +94,13 @@ public class Player : MonoBehaviour
         {
             pukeParticleSystem.Stop();
         }
+        
+        // Configure puke audio source to loop and ensure it's stopped at start
+        if (pukeAudioSource != null)
+        {
+            pukeAudioSource.loop = true;
+            pukeAudioSource.Stop();
+        }
     }
 
     void Update()
@@ -115,8 +127,9 @@ public class Player : MonoBehaviour
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
         wobbleFrequency = Mathf.Min(wobbleFrequency + (wobbleFrequencyIncreaseRate * Time.deltaTime), maximumWobbleFrequency);
 
-        // Safety check: Ensure particle system state matches isPuking state
+        // Safety check: Ensure particle system and audio state matches isPuking state
         UpdatePukeParticleSystem();
+        UpdatePukeAudio();
 
         /*if (isPuking)
         {
@@ -225,8 +238,9 @@ public class Player : MonoBehaviour
     {
         isPuking = true;
         
-        // Update particle system state
+        // Update particle system and audio state
         UpdatePukeParticleSystem();
+        UpdatePukeAudio();
         
         StartCoroutine(PukeCoroutine(duration));
     }
@@ -238,8 +252,9 @@ public class Player : MonoBehaviour
         drunkennessMeter = 0f;
         isPuking = false;
         
-        // Update particle system state
+        // Update particle system and audio state
         UpdatePukeParticleSystem();
+        UpdatePukeAudio();
     }
 
     private void EatCandy(float duration)
@@ -378,8 +393,9 @@ public class Player : MonoBehaviour
         currentSpeed = 0f;
         isSprinting = false;
         
-        // Stop puke particle system when player dies
+        // Stop puke particle system and audio when player dies
         UpdatePukeParticleSystem();
+        UpdatePukeAudio();
         
         Debug.Log("Player has died! Game Over.");
     }
@@ -400,6 +416,27 @@ public class Player : MonoBehaviour
                 if (pukeParticleSystem.isPlaying)
                 {
                     pukeParticleSystem.Stop();
+                }
+            }
+        }
+    }
+
+    private void UpdatePukeAudio()
+    {
+        if (pukeAudioSource != null)
+        {
+            if (isPuking)
+            {
+                if (!pukeAudioSource.isPlaying)
+                {
+                    pukeAudioSource.Play();
+                }
+            }
+            else
+            {
+                if (pukeAudioSource.isPlaying)
+                {
+                    pukeAudioSource.Stop();
                 }
             }
         }
