@@ -248,12 +248,48 @@ public class Player : MonoBehaviour
         Debug.Log("Fallen");
         hasFallen = true;
         baseX = transform.position.x;
+        
+        // Trigger falling animation
+        if (animator != null)
+        {
+            animator.SetBool("IsFalling", true);
+            animator.SetBool("IsStanding", false);
+        }
+        
         StartCoroutine(FallCoroutine(duration));
     }
 
     private IEnumerator FallCoroutine(float duration)
     {
+        // Wait for falling animation duration
         yield return new WaitForSeconds(duration);
+        
+        Debug.Log("Falling animation finished, transitioning to standing...");
+        
+        // Transition to standing animation
+        if (animator != null)
+        {
+            animator.SetBool("IsFalling", false);
+            animator.SetBool("IsStanding", true);
+            Debug.Log("Set IsFalling=false, IsStanding=true");
+        }
+        else
+        {
+            Debug.LogError("Animator is null!");
+        }
+        
+        // Wait for standing animation to play - increased timing
+        yield return new WaitForSeconds(1.0f); // Increased from 0.5f to 1.0f
+        
+        Debug.Log("Standing animation finished, returning to default state...");
+        
+        // Reset to default state
+        if (animator != null)
+        {
+            animator.SetBool("IsStanding", false);
+            Debug.Log("Set IsStanding=false");
+        }
+        
         UIManager.Instance.ResetBalanceBar();
         hasFallen = false;
         wobbleFrequency = startingWobbleFrequency;
