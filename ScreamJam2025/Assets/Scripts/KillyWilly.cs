@@ -18,6 +18,11 @@ public class KillyWilly : MonoBehaviour
     [SerializeField] private float attackDuration = 1f;
     [SerializeField] private float danceDuration = 2f;
     
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip danceSound;
+    
     private bool isAttacking = false;
     private bool isDancing = false;
     
@@ -44,6 +49,16 @@ public class KillyWilly : MonoBehaviour
             if (animator == null)
             {
                 Debug.LogWarning("Killy Willy: Animator component not found! Make sure to assign an Animator component.");
+            }
+        }
+        
+        // If audio source isn't assigned, try to get it from this GameObject
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                Debug.LogWarning("Killy Willy: AudioSource component not found! Make sure to assign an AudioSource component.");
             }
         }
     }
@@ -144,6 +159,21 @@ public class KillyWilly : MonoBehaviour
             animator.SetBool("IsAttacking", true);
         }
         
+        // Play attack sound once
+        if (audioSource != null && attackSound != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+            Debug.Log("KillyWilly: Playing attack sound");
+        }
+        else if (audioSource == null)
+        {
+            Debug.LogWarning("Killy Willy: AudioSource not found, cannot play attack sound");
+        }
+        else if (attackSound == null)
+        {
+            Debug.LogWarning("Killy Willy: Attack sound clip not assigned");
+        }
+        
         // Start the attack duration coroutine
         StartCoroutine(AttackSequence());
     }
@@ -190,6 +220,21 @@ public class KillyWilly : MonoBehaviour
         else
         {
             Debug.LogWarning("Killy Willy: Animator not found, cannot start dancing animation");
+        }
+        
+        // Play dance sound once
+        if (audioSource != null && danceSound != null)
+        {
+            audioSource.PlayOneShot(danceSound);
+            Debug.Log("KillyWilly: Playing dance sound");
+        }
+        else if (audioSource == null)
+        {
+            Debug.LogWarning("Killy Willy: AudioSource not found, cannot play dance sound");
+        }
+        else if (danceSound == null)
+        {
+            Debug.LogWarning("Killy Willy: Dance sound clip not assigned");
         }
     }
     
