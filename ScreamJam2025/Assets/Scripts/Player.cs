@@ -46,6 +46,13 @@ public class Player : MonoBehaviour
     [Tooltip("Duration for each victory animation before switching to the next one.")]
     [SerializeField] private float victoryAnimationDuration = 1.0f;
 
+    [Header("Falling Animation Settings")]
+    
+    [Tooltip("Duration for the falling animation to complete.")]
+    [SerializeField] private float fallingAnimationDuration = Mathf.PI;
+    [Tooltip("Duration for the standing animation to complete after falling.")]
+    [SerializeField] private float standingAnimationDuration = 1.0f;
+
     [Header("Particle Effects")]
 
     [Tooltip("The particle system that plays when the player is puking.")]
@@ -68,7 +75,6 @@ public class Player : MonoBehaviour
 
     public float baseX;
     private bool hasFallen = false;
-    private float fallTime = Mathf.PI;
 
     void Start()
     {
@@ -209,7 +215,7 @@ public class Player : MonoBehaviour
         {
             if (transform.position.x < baseX - wobbleAmplitude * fallingThreshold || transform.position.x > baseX + wobbleAmplitude * fallingThreshold)
             {
-                Fall(fallTime);
+                Fall(fallingAnimationDuration);
             }
         }
 
@@ -284,8 +290,8 @@ public class Player : MonoBehaviour
             Debug.LogError("Animator is null!");
         }
         
-        // Wait for standing animation to play - increased timing
-        yield return new WaitForSeconds(1.0f); // Increased from 0.5f to 1.0f
+        // Wait for standing animation to play
+        yield return new WaitForSeconds(standingAnimationDuration);
         
         Debug.Log("Standing animation finished, returning to default state...");
         
