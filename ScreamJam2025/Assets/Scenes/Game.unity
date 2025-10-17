@@ -1191,10 +1191,10 @@ MonoBehaviour:
   pukingTime: 2
   wobbleAmplitude: 5
   startingWobbleFrequency: 1
-  maximumWobbleFrequency: 4
+  maximumWobbleFrequency: 2.5
   maxDrunkenness: 7
   fallingThreshold: 0.8
-  strafingCoefficient: 0.8
+  strafingCoefficient: 1.5
   candyEatingTime: 1
   candyRestoreMagnitude: 3
   animator: {fileID: 1608571553}

@@ -83,6 +83,7 @@ public class Player : MonoBehaviour
     private bool isPuking = false;
     private float wobbleFrequencyIncreaseRate = 0.05f;
     private float wobbleFrequency;
+    private float startAdder = 0;
     private float currentSpeed;
     private bool isSprinting = false;
     private bool isDead = false;
@@ -273,11 +274,11 @@ public class Player : MonoBehaviour
             animator.SetBool("IsDead", isDead);
         }
 
-        if (Time.time > 1f)
+        if (Time.time > 3f)
         {
             if (transform.position.x < baseX - wobbleAmplitude * fallingThreshold || transform.position.x > baseX + wobbleAmplitude * fallingThreshold)
             {
-                Fall(fallingAnimationDuration / wobbleFrequency);
+                Fall(fallingAnimationDuration);
             }
         }
 
@@ -371,7 +372,9 @@ public class Player : MonoBehaviour
         baseX = transform.position.x;
         UIManager.Instance.ResetBalanceBar();
         hasFallen = false;
-        wobbleFrequency = startingWobbleFrequency;
+        /*drunkennessIncreaseRate = drunkennessIncreaseRate * 1.5f;*/
+        startAdder += 0.05f;
+        wobbleFrequency = Mathf.Min(startingWobbleFrequency + startAdder, startingWobbleFrequency + 0.3f);
     }
 
     private void StartVictoryAnimation()
