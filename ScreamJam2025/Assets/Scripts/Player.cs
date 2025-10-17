@@ -66,12 +66,16 @@ public class Player : MonoBehaviour
 
     [Header("Camera Settings")]
 
-    [Tooltip("The Cinemachine virtual camera for FOV control.")]
-    [SerializeField] private CinemachineCamera virtualCamera;
+    [Tooltip("The initial Cinemachine camera shown when game starts.")]
+    [SerializeField] private CinemachineCamera initialCamera;
+    [Tooltip("The main follow camera for gameplay.")]
+    [SerializeField] private CinemachineCamera followCamera;
     [Tooltip("FOV increase amount when boosting.")]
     [SerializeField] private float fovIncrease = 10f;
     [Tooltip("Speed of FOV transition when boosting starts/stops.")]
     [SerializeField] private float fovTransitionSpeed = 5f;
+    [Tooltip("Delay before switching from initial camera to follow camera (in seconds).")]
+    [SerializeField] private float cameraSwitchDelay = 2f;
 
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
@@ -96,6 +100,10 @@ public class Player : MonoBehaviour
     private bool isFOVIncreased = false;
     private float targetFOV;
     private bool isTransitioningFOV = false;
+    
+    // Camera switching variables
+    private bool hasSwitchedToFollowCamera = false;
+    private CinemachineCamera currentActiveCamera;
 
     void Start()
     {
@@ -118,12 +126,11 @@ public class Player : MonoBehaviour
             pukeAudioSource.Stop();
         }
         
-        // Initialize FOV control
-        if (virtualCamera != null)
-        {
-            originalFOV = virtualCamera.Lens.FieldOfView;
-            targetFOV = originalFOV;
-        }
+        // Initialize camera system
+        InitializeCameraSystem();
+        
+        // Start camera switching coroutine
+        StartCoroutine(CameraSwitchCoroutine());
     }
 
     void Update()
@@ -530,9 +537,65 @@ public class Player : MonoBehaviour
         }
     }
     
+    private void InitializeCameraSystem()
+    {
+        // Set initial camera as active
+        if (initialCamera != null)
+        {
+            initialCamera.Priority = 10;
+            currentActiveCamera = initialCamera;
+        }
+        
+        // Set follow camera as inactive initially
+        if (followCamera != null)
+        {
+            followCamera.Priority = 0;
+        }
+        
+        // Initialize FOV control with the active camera
+        if (currentActiveCamera != null)
+        {
+            originalFOV = currentActiveCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+        }
+    }
+    
+    private IEnumerator CameraSwitchCoroutine()
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(cameraSwitchDelay);
+        
+        // Switch to follow camera
+        SwitchToFollowCamera();
+    }
+    
+    private void SwitchToFollowCamera()
+    {
+        if (followCamera != null && !hasSwitchedToFollowCamera)
+        {
+            // Switch camera priorities
+            if (initialCamera != null)
+            {
+                initialCamera.Priority = 0;
+            }
+            followCamera.Priority = 10;
+            
+            // Update current active camera
+            currentActiveCamera = followCamera;
+            
+            // Update FOV control with new camera
+            originalFOV = followCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+            
+            hasSwitchedToFollowCamera = true;
+            
+            Debug.Log("Switched to follow camera");
+        }
+    }
+    
     private void IncreaseFOV()
     {
-        if (virtualCamera != null && !isFOVIncreased)
+        if (currentActiveCamera != null && !isFOVIncreased)
         {
             targetFOV = originalFOV + fovIncrease;
             isFOVIncreased = true;
@@ -542,7 +605,7 @@ public class Player : MonoBehaviour
     
     private void ResetFOV()
     {
-        if (virtualCamera != null && isFOVIncreased)
+        if (currentActiveCamera != null && isFOVIncreased)
         {
             targetFOV = originalFOV;
             isFOVIncreased = false;
@@ -552,16 +615,16 @@ public class Player : MonoBehaviour
     
     private void UpdateFOVTransition()
     {
-        if (virtualCamera != null && isTransitioningFOV)
+        if (currentActiveCamera != null && isTransitioningFOV)
         {
-            float currentFOV = virtualCamera.Lens.FieldOfView;
+            float currentFOV = currentActiveCamera.Lens.FieldOfView;
             float newFOV = Mathf.Lerp(currentFOV, targetFOV, fovTransitionSpeed * Time.deltaTime);
-            virtualCamera.Lens.FieldOfView = newFOV;
+            currentActiveCamera.Lens.FieldOfView = newFOV;
             
             // Check if we're close enough to the target to stop transitioning
             if (Mathf.Abs(newFOV - targetFOV) < 0.1f)
             {
-                virtualCamera.Lens.FieldOfView = targetFOV;
+                currentActiveCamera.Lens.FieldOfView = targetFOV;
                 isTransitioningFOV = false;
             }
         }

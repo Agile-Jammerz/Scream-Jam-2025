@@ -1203,9 +1203,11 @@ MonoBehaviour:
   standingAnimationDuration: 1
   pukeParticleSystem: {fileID: 756367558}
   pukeAudioSource: {fileID: 49203956}
-  virtualCamera: {fileID: 615183003}
+  initialCamera: {fileID: 1728930037}
+  followCamera: {fileID: 615183003}
   fovIncrease: 20
   fovTransitionSpeed: 2
+  cameraSwitchDelay: 3
   drunkennessMeter: 0
   candyCount: 0
   baseX: 0
@@ -2744,7 +2746,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority:
     Enabled: 1
-    m_Value: 20
+    m_Value: 10
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -4703,8 +4705,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961739749}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.18910752, y: 0.000000021360739, z: -0.000000004113702, w: 0.9819564}
-  m_LocalPosition: {x: 0, y: 12.25, z: -17.310299}
+  m_LocalRotation: {x: 0, y: -0.3420201, z: 0, w: 0.9396927}
+  m_LocalPosition: {x: 11.8, y: 6.2, z: -31.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7672,7 +7674,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority:
     Enabled: 1
-    m_Value: 10
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
