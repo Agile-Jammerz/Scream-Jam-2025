@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class Player : MonoBehaviour
 {
@@ -63,6 +64,15 @@ public class Player : MonoBehaviour
     [Tooltip("The audio source that plays the puke sound effect.")]
     [SerializeField] private AudioSource pukeAudioSource;
 
+    [Header("Camera Settings")]
+
+    [Tooltip("The Cinemachine virtual camera for FOV control.")]
+    [SerializeField] private CinemachineCamera virtualCamera;
+    [Tooltip("FOV increase amount when boosting.")]
+    [SerializeField] private float fovIncrease = 10f;
+    [Tooltip("Speed of FOV transition when boosting starts/stops.")]
+    [SerializeField] private float fovTransitionSpeed = 5f;
+
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
@@ -80,6 +90,12 @@ public class Player : MonoBehaviour
 
     public float baseX;
     private bool hasFallen = false;
+    
+    // FOV control variables
+    private float originalFOV;
+    private bool isFOVIncreased = false;
+    private float targetFOV;
+    private bool isTransitioningFOV = false;
 
     void Start()
     {
@@ -100,6 +116,13 @@ public class Player : MonoBehaviour
         {
             pukeAudioSource.loop = true;
             pukeAudioSource.Stop();
+        }
+        
+        // Initialize FOV control
+        if (virtualCamera != null)
+        {
+            originalFOV = virtualCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
         }
     }
 
@@ -149,6 +172,9 @@ public class Player : MonoBehaviour
             }
             HandleMovement();
         }
+        
+        // Handle FOV transitions
+        UpdateFOVTransition();
     }
     
     private void HandleMovement()
@@ -162,6 +188,10 @@ public class Player : MonoBehaviour
             // Activate boost movement
             currentSpeed = boostSpeed;
             isSprinting = true;
+            
+            // Increase FOV when boosting
+            IncreaseFOV();
+            
             if (!consumingCandy)
             {
                 drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
@@ -182,6 +212,10 @@ public class Player : MonoBehaviour
         {
             currentSpeed = moveSpeed;
             isSprinting = false;
+            
+            // Reset FOV when not boosting
+            ResetFOV();
+            
             if (consumingCandy)
             {
                 drunkennessMeter = Mathf.Max(0, drunkennessMeter - candyDecreaseRate * Time.deltaTime);
@@ -237,6 +271,9 @@ public class Player : MonoBehaviour
     private void StartPuking(float duration)
     {
         isPuking = true;
+        
+        // Reset FOV when puking starts
+        ResetFOV();
         
         // Update particle system and audio state
         UpdatePukeParticleSystem();
@@ -489,6 +526,43 @@ public class Player : MonoBehaviour
             if (!isDead)
             {
                 PlayerDeath();
+            }
+        }
+    }
+    
+    private void IncreaseFOV()
+    {
+        if (virtualCamera != null && !isFOVIncreased)
+        {
+            targetFOV = originalFOV + fovIncrease;
+            isFOVIncreased = true;
+            isTransitioningFOV = true;
+        }
+    }
+    
+    private void ResetFOV()
+    {
+        if (virtualCamera != null && isFOVIncreased)
+        {
+            targetFOV = originalFOV;
+            isFOVIncreased = false;
+            isTransitioningFOV = true;
+        }
+    }
+    
+    private void UpdateFOVTransition()
+    {
+        if (virtualCamera != null && isTransitioningFOV)
+        {
+            float currentFOV = virtualCamera.Lens.FieldOfView;
+            float newFOV = Mathf.Lerp(currentFOV, targetFOV, fovTransitionSpeed * Time.deltaTime);
+            virtualCamera.Lens.FieldOfView = newFOV;
+            
+            // Check if we're close enough to the target to stop transitioning
+            if (Mathf.Abs(newFOV - targetFOV) < 0.1f)
+            {
+                virtualCamera.Lens.FieldOfView = targetFOV;
+                isTransitioningFOV = false;
             }
         }
     }

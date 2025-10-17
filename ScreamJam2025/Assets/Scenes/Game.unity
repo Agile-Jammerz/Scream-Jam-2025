@@ -1203,6 +1203,9 @@ MonoBehaviour:
   standingAnimationDuration: 1
   pukeParticleSystem: {fileID: 756367558}
   pukeAudioSource: {fileID: 49203956}
+  virtualCamera: {fileID: 615183003}
+  fovIncrease: 20
+  fovTransitionSpeed: 2
   drunkennessMeter: 0
   candyCount: 0
   baseX: 0
