@@ -167,7 +167,6 @@ public class Player : MonoBehaviour
         
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
         wobbleFrequency = Mathf.Min(wobbleFrequency + wobbleFrequencyIncreaseRate * Time.deltaTime, maximumWobbleFrequency);
-        Debug.Log(wobbleFrequency);
 
         // Safety check: Ensure particle system and audio state matches isPuking state
         UpdatePukeParticleSystem();
