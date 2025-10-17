@@ -93,6 +93,12 @@ public class KillyWilly : MonoBehaviour
     
     private void MoveTowardsPlayer()
     {
+        // Don't move or rotate when dancing
+        if (isDancing)
+        {
+            return;
+        }
+        
         // Calculate direction to the player
         Vector3 direction = (player.position - transform.position).normalized;
         

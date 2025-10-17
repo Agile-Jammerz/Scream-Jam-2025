@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class Player : MonoBehaviour
 {
@@ -63,6 +64,19 @@ public class Player : MonoBehaviour
     [Tooltip("The audio source that plays the puke sound effect.")]
     [SerializeField] private AudioSource pukeAudioSource;
 
+    [Header("Camera Settings")]
+
+    [Tooltip("The initial Cinemachine camera shown when game starts.")]
+    [SerializeField] private CinemachineCamera initialCamera;
+    [Tooltip("The main follow camera for gameplay.")]
+    [SerializeField] private CinemachineCamera followCamera;
+    [Tooltip("FOV increase amount when boosting.")]
+    [SerializeField] private float fovIncrease = 10f;
+    [Tooltip("Speed of FOV transition when boosting starts/stops.")]
+    [SerializeField] private float fovTransitionSpeed = 5f;
+    [Tooltip("Delay before switching from initial camera to follow camera (in seconds).")]
+    [SerializeField] private float cameraSwitchDelay = 2f;
+
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
     private float drunkennessLevel = 0f;
@@ -80,6 +94,16 @@ public class Player : MonoBehaviour
 
     public float baseX;
     private bool hasFallen = false;
+    
+    // FOV control variables
+    private float originalFOV;
+    private bool isFOVIncreased = false;
+    private float targetFOV;
+    private bool isTransitioningFOV = false;
+    
+    // Camera switching variables
+    private bool hasSwitchedToFollowCamera = false;
+    private CinemachineCamera currentActiveCamera;
 
     void Start()
     {
@@ -101,6 +125,12 @@ public class Player : MonoBehaviour
             pukeAudioSource.loop = true;
             pukeAudioSource.Stop();
         }
+        
+        // Initialize camera system
+        InitializeCameraSystem();
+        
+        // Start camera switching coroutine
+        StartCoroutine(CameraSwitchCoroutine());
     }
 
     void Update()
@@ -150,6 +180,9 @@ public class Player : MonoBehaviour
             }
             HandleMovement();
         }
+        
+        // Handle FOV transitions
+        UpdateFOVTransition();
     }
     
     private void HandleMovement()
@@ -163,6 +196,10 @@ public class Player : MonoBehaviour
             // Activate boost movement
             currentSpeed = boostSpeed;
             isSprinting = true;
+            
+            // Increase FOV when boosting
+            IncreaseFOV();
+            
             if (!consumingCandy)
             {
                 drunkennessMeter += drunkennessIncreaseRate * Time.deltaTime;
@@ -183,6 +220,10 @@ public class Player : MonoBehaviour
         {
             currentSpeed = moveSpeed;
             isSprinting = false;
+            
+            // Reset FOV when not boosting
+            ResetFOV();
+            
             if (consumingCandy)
             {
                 drunkennessMeter = Mathf.Max(0, drunkennessMeter - candyDecreaseRate * Time.deltaTime);
@@ -245,6 +286,9 @@ public class Player : MonoBehaviour
     private void StartPuking(float duration)
     {
         isPuking = true;
+        
+        // Reset FOV when puking starts
+        ResetFOV();
         
         // Update particle system and audio state
         UpdatePukeParticleSystem();
@@ -497,6 +541,99 @@ public class Player : MonoBehaviour
             if (!isDead)
             {
                 PlayerDeath();
+            }
+        }
+    }
+    
+    private void InitializeCameraSystem()
+    {
+        // Set initial camera as active
+        if (initialCamera != null)
+        {
+            initialCamera.Priority = 10;
+            currentActiveCamera = initialCamera;
+        }
+        
+        // Set follow camera as inactive initially
+        if (followCamera != null)
+        {
+            followCamera.Priority = 0;
+        }
+        
+        // Initialize FOV control with the active camera
+        if (currentActiveCamera != null)
+        {
+            originalFOV = currentActiveCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+        }
+    }
+    
+    private IEnumerator CameraSwitchCoroutine()
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(cameraSwitchDelay);
+        
+        // Switch to follow camera
+        SwitchToFollowCamera();
+    }
+    
+    private void SwitchToFollowCamera()
+    {
+        if (followCamera != null && !hasSwitchedToFollowCamera)
+        {
+            // Switch camera priorities
+            if (initialCamera != null)
+            {
+                initialCamera.Priority = 0;
+            }
+            followCamera.Priority = 10;
+            
+            // Update current active camera
+            currentActiveCamera = followCamera;
+            
+            // Update FOV control with new camera
+            originalFOV = followCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+            
+            hasSwitchedToFollowCamera = true;
+            
+            Debug.Log("Switched to follow camera");
+        }
+    }
+    
+    private void IncreaseFOV()
+    {
+        if (currentActiveCamera != null && !isFOVIncreased)
+        {
+            targetFOV = originalFOV + fovIncrease;
+            isFOVIncreased = true;
+            isTransitioningFOV = true;
+        }
+    }
+    
+    private void ResetFOV()
+    {
+        if (currentActiveCamera != null && isFOVIncreased)
+        {
+            targetFOV = originalFOV;
+            isFOVIncreased = false;
+            isTransitioningFOV = true;
+        }
+    }
+    
+    private void UpdateFOVTransition()
+    {
+        if (currentActiveCamera != null && isTransitioningFOV)
+        {
+            float currentFOV = currentActiveCamera.Lens.FieldOfView;
+            float newFOV = Mathf.Lerp(currentFOV, targetFOV, fovTransitionSpeed * Time.deltaTime);
+            currentActiveCamera.Lens.FieldOfView = newFOV;
+            
+            // Check if we're close enough to the target to stop transitioning
+            if (Mathf.Abs(newFOV - targetFOV) < 0.1f)
+            {
+                currentActiveCamera.Lens.FieldOfView = targetFOV;
+                isTransitioningFOV = false;
             }
         }
     }
