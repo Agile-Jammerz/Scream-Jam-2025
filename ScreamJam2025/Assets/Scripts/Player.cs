@@ -125,7 +125,8 @@ public class Player : MonoBehaviour
         }
         
         drunkennessLevel = drunkennessMeter / maxDrunkenness;
-        wobbleFrequency = Mathf.Min(wobbleFrequency + (wobbleFrequencyIncreaseRate * Time.deltaTime), maximumWobbleFrequency);
+        wobbleFrequency = Mathf.Min(wobbleFrequency + wobbleFrequencyIncreaseRate * Time.deltaTime, maximumWobbleFrequency);
+        Debug.Log(wobbleFrequency);
 
         // Safety check: Ensure particle system and audio state matches isPuking state
         UpdatePukeParticleSystem();
@@ -197,7 +198,14 @@ public class Player : MonoBehaviour
 
         // Create movement vector relative to player's current rotation
         Vector3 movement = transform.right * horizontal * wobbleFrequency * strafingCoefficient + transform.forward * vertical;
-        float wobbleX = Mathf.Cos((Time.time + 0.0f * Mathf.PI) * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
+        float wobbleX;
+        if (wobbleFrequency < maximumWobbleFrequency)
+        {
+            wobbleX = Mathf.Cos((Time.time) * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * (wobbleFrequency + Mathf.Log(wobbleFrequency, 2)));
+        } else
+        {
+            wobbleX = Mathf.Cos((Time.time) * wobbleFrequency) * (Time.deltaTime * wobbleAmplitude * wobbleFrequency);
+        }
         float wobbleY = 0f;
         float wobbleZ = 0f;
         if (drunkennessLevel > 0.1)
@@ -224,11 +232,11 @@ public class Player : MonoBehaviour
             animator.SetBool("IsDead", isDead);
         }
 
-        if (Time.time > 3)
+        if (Time.time > 1f)
         {
             if (transform.position.x < baseX - wobbleAmplitude * fallingThreshold || transform.position.x > baseX + wobbleAmplitude * fallingThreshold)
             {
-                Fall(fallingAnimationDuration);
+                Fall(fallingAnimationDuration / wobbleFrequency);
             }
         }
 
@@ -274,7 +282,6 @@ public class Player : MonoBehaviour
     {
         Debug.Log("Fallen");
         hasFallen = true;
-        baseX = transform.position.x;
         
         // Trigger falling animation
         if (animator != null)
@@ -316,7 +323,8 @@ public class Player : MonoBehaviour
             animator.SetBool("IsStanding", false);
             Debug.Log("Set IsStanding=false");
         }
-        
+
+        baseX = transform.position.x;
         UIManager.Instance.ResetBalanceBar();
         hasFallen = false;
         wobbleFrequency = startingWobbleFrequency;
