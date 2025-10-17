@@ -70,12 +70,20 @@ public class Player : MonoBehaviour
     [SerializeField] private CinemachineCamera initialCamera;
     [Tooltip("The main follow camera for gameplay.")]
     [SerializeField] private CinemachineCamera followCamera;
+    [Tooltip("The camera shown when the player dies.")]
+    [SerializeField] private CinemachineCamera deathCamera;
+    [Tooltip("The camera shown when the player reaches the goal.")]
+    [SerializeField] private CinemachineCamera victoryCamera;
     [Tooltip("FOV increase amount when boosting.")]
     [SerializeField] private float fovIncrease = 10f;
     [Tooltip("Speed of FOV transition when boosting starts/stops.")]
     [SerializeField] private float fovTransitionSpeed = 5f;
     [Tooltip("Delay before switching from initial camera to follow camera (in seconds).")]
     [SerializeField] private float cameraSwitchDelay = 2f;
+    [Tooltip("Delay before switching to death camera when player dies (in seconds).")]
+    [SerializeField] private float deathCameraDelay = 0.5f;
+    [Tooltip("Delay before switching to victory camera when goal is reached (in seconds).")]
+    [SerializeField] private float victoryCameraDelay = 0.3f;
 
     private float drunkennessIncreaseRate = 1f;
     public float drunkennessMeter = 0f;
@@ -103,6 +111,8 @@ public class Player : MonoBehaviour
     
     // Camera switching variables
     private bool hasSwitchedToFollowCamera = false;
+    private bool hasSwitchedToDeathCamera = false;
+    private bool hasSwitchedToVictoryCamera = false;
     private CinemachineCamera currentActiveCamera;
 
     void Start()
@@ -441,7 +451,19 @@ public class Player : MonoBehaviour
         UpdatePukeParticleSystem();
         UpdatePukeAudio();
         
+        // Start death camera transition
+        StartCoroutine(DeathCameraCoroutine());
+        
         Debug.Log("Player has died! Game Over.");
+    }
+    
+    private IEnumerator DeathCameraCoroutine()
+    {
+        // Wait for the specified delay before switching to death camera
+        yield return new WaitForSeconds(deathCameraDelay);
+        
+        // Switch to death camera
+        SwitchToDeathCamera();
     }
 
     private void UpdatePukeParticleSystem()
@@ -516,6 +538,9 @@ public class Player : MonoBehaviour
             if (!isVictory && !isDead)
             {
                 StartVictoryAnimation();
+                
+                // Start victory camera transition
+                StartCoroutine(VictoryCameraCoroutine());
             }
             
             GameManager.Instance.PlayerWin();
@@ -550,6 +575,18 @@ public class Player : MonoBehaviour
         if (followCamera != null)
         {
             followCamera.Priority = 0;
+        }
+        
+        // Set death camera as inactive initially
+        if (deathCamera != null)
+        {
+            deathCamera.Priority = 0;
+        }
+        
+        // Set victory camera as inactive initially
+        if (victoryCamera != null)
+        {
+            victoryCamera.Priority = 0;
         }
         
         // Initialize FOV control with the active camera
@@ -591,6 +628,75 @@ public class Player : MonoBehaviour
             
             Debug.Log("Switched to follow camera");
         }
+    }
+    
+    private void SwitchToDeathCamera()
+    {
+        if (deathCamera != null && !hasSwitchedToDeathCamera)
+        {
+            // Switch camera priorities - death camera gets highest priority
+            if (initialCamera != null)
+            {
+                initialCamera.Priority = 0;
+            }
+            if (followCamera != null)
+            {
+                followCamera.Priority = 0;
+            }
+            deathCamera.Priority = 15; // Higher priority than other cameras
+            
+            // Update current active camera
+            currentActiveCamera = deathCamera;
+            
+            // Update FOV control with new camera
+            originalFOV = deathCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+            
+            hasSwitchedToDeathCamera = true;
+            
+            Debug.Log("Switched to death camera");
+        }
+    }
+    
+    private void SwitchToVictoryCamera()
+    {
+        if (victoryCamera != null && !hasSwitchedToVictoryCamera)
+        {
+            // Switch camera priorities - victory camera gets highest priority
+            if (initialCamera != null)
+            {
+                initialCamera.Priority = 0;
+            }
+            if (followCamera != null)
+            {
+                followCamera.Priority = 0;
+            }
+            if (deathCamera != null)
+            {
+                deathCamera.Priority = 0;
+            }
+            victoryCamera.Priority = 20; // Highest priority for victory
+            
+            // Update current active camera
+            currentActiveCamera = victoryCamera;
+            
+            // Update FOV control with new camera
+            originalFOV = victoryCamera.Lens.FieldOfView;
+            targetFOV = originalFOV;
+            
+            hasSwitchedToVictoryCamera = true;
+            
+            Debug.Log("Switched to victory camera");
+        }
+    }
+    
+    private IEnumerator VictoryCameraCoroutine()
+    {
+        // Wait for the specified delay before switching to victory camera
+        yield return new WaitForSeconds(victoryCameraDelay);
+        
+        // Switch to victory camera
+        SwitchToVictoryCamera();
     }
     
     private void IncreaseFOV()
